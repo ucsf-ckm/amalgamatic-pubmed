@@ -1,0 +1,24 @@
+{
+  "name": "amalgamatic-pubmed",
+  "description": "PubMed plugin for amalgamatic",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ucsf-ckm/amalgamatic-pubmed.git"
+  },
+  "version": "1.0.0",
+  "dependencies": {
+    "cheerio": "^0.17.0"
+  },
+  "scripts": {
+    "test": "node_modules/lab/bin/lab -t 100"
+  },
+  "engines": {
+    "node": "0.10.x"
+  },
+  "devDependencies": {
+    "jshint": "^2.5.5",
+    "lab": "^4.4.4",
+    "nock": "^0.47.0",
+    "precommit-hook": "^1.0.7"
+  }
+}
