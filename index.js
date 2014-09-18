@@ -41,7 +41,7 @@ exports.search = function (query, callback) {
 
             var options = {
                 host: 'eutils.ncbi.nlm.nih.gov',
-                path: '/entrez/eutils/esummary.fcgi?retmode=json&' +
+                path: '/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&' +
                     querystring.stringify( {id: uids} )
             };
 
@@ -66,8 +66,8 @@ exports.search = function (query, callback) {
                             if ($[id]) {
                                 result.push({
                                     name: $[id].title || $[id].booktitle,
-                                    url: 'http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=pubmed&cmd=Retrieve&dopt=AbstractPlus&query_hl=2&itool=pubmed_docsum&tool=cdl&otool=cdlotool&list_uids=' +
-                                        querystring.stringify(id)
+                                    url: 'http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=pubmed&cmd=Retrieve&dopt=AbstractPlus&query_hl=2&itool=pubmed_docsum&tool=cdl&otool=cdlotool&' +
+                                        querystring.stringify({ list_uids: id })
                                 });
                             }
                         });
@@ -77,7 +77,6 @@ exports.search = function (query, callback) {
                 });
             })
             .on('error', function (e) {
-                console.dir(e);
                 callback({error: e.message});
             });
         });

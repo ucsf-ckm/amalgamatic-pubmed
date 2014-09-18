@@ -38,7 +38,7 @@ describe('exports', function () {
 			.reply('200', '{"esearchresult": {"count": "2","retmax": "2","retstart": "0","idlist": ["25230398","25230381"]}}');
 
 		nock('http://eutils.ncbi.nlm.nih.gov')
-			.get('/entrez/eutils/esummary.fcgi?retmode=json&id=25230398%2C25230381')
+			.get('/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&id=25230398%2C25230381')
 			.reply('200', '{"result": {"uids": ["25230398","25230381"], "25230398": {"title": "Medicine 1"}, "25230381": {"title": "Medicine 2"}}}');
 
 		pubmed.search('medicine', function (result) {
@@ -98,7 +98,7 @@ describe('exports', function () {
 			.reply('200', '{"esearchresult": {"count": "2","retmax": "2","retstart": "0","idlist": ["25230398","25230381"]}}');
 
 		nock('http://eutils.ncbi.nlm.nih.gov')
-			.get('/entrez/eutils/esummary.fcgi?retmode=json&id=25230398%2C25230381')
+			.get('/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&id=25230398%2C25230381')
 			.reply('200', 'fhqwhgads: to the limit');
 
 		pubmed.search('medicine', function (result) {
@@ -114,7 +114,7 @@ describe('exports', function () {
 			.reply('200', '{"esearchresult": {"count": "2","retmax": "2","retstart": "0","idlist": ["25230398","25230381"]}}');
 
 		nock('http://eutils.ncbi.nlm.nih.gov')
-			.get('/entrez/eutils/esummary.fcgi?retmode=json&id=25230398%2C25230381')
+			.get('/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&id=25230398%2C25230381')
 			.reply('200', '{}');
 
 		pubmed.search('medicine', function (result) {
@@ -130,7 +130,7 @@ describe('exports', function () {
 			.reply('200', '{"esearchresult": {"count": "2","retmax": "2","retstart": "0","idlist": ["25230398","25230381"]}}');
 
 		nock('http://eutils.ncbi.nlm.nih.gov')
-			.get('/entrez/eutils/esummary.fcgi?retmode=json&id=25230398%2C25230381')
+			.get('/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&id=25230398%2C25230381')
 			.reply('200', '{"result": {"uids": ["25230398","25230381"], "25230381": {"title": "Medicine 2"}}}');
 
 		pubmed.search('medicine', function (result) {
@@ -146,7 +146,7 @@ describe('exports', function () {
 			.reply('200', '{"esearchresult": {"count": "2","retmax": "2","retstart": "0","idlist": ["25230398","25230381"]}}');
 
 		nock('http://eutils.ncbi.nlm.nih.gov')
-			.get('/entrez/eutils/esummary.fcgi?retmode=json&id=25230398%2C25230381')
+			.get('/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&id=25230398%2C25230381')
 			.reply('200', '{"result": {"uids": ["25230398","25230381"], "25230398": {"booktitle": "Medicine 1"}, "25230381": {"booktitle": "Medicine 2"}}}');
 
 		pubmed.search('medicine', function (result) {
@@ -166,6 +166,22 @@ describe('exports', function () {
 		pubmed.search('medicine', function (result) {
 			expect(result.data).to.be.undefined;
 			expect(result.error).to.equal('Nock: Not allow net connect for "eutils.ncbi.nlm.nih.gov:80"');
+			done();
+		});
+	});
+
+	it('returns URLs that include the returned UIDs', function (done) {
+		nock('http://eutils.ncbi.nlm.nih.gov')
+			.get('/entrez/eutils/esearch.fcgi?retmode=json&term=medicine')
+			.reply('200', '{"esearchresult": {"count": "2","retmax": "2","retstart": "0","idlist": ["25230398","25230381"]}}');
+
+		nock('http://eutils.ncbi.nlm.nih.gov')
+			.get('/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&id=25230398%2C25230381')
+			.reply('200', '{"result": {"uids": ["25230398","25230381"], "25230398": {"title": "Medicine 1"}, "25230381": {"title": "Medicine 2"}}}');
+
+		pubmed.search('medicine', function (result) {
+			expect(result.data[0].url.indexOf('25230398') !== -1).to.be.ok;
+			expect(result.data[1].url.indexOf('25230381') !== -1).to.be.ok;
 			done();
 		});
 	});
