@@ -4,7 +4,7 @@ var http = require('http');
 exports.search = function (query, callback) {
     'use strict';
 
-    if (! query) {
+    if (! query || ! query.searchTerm) {
         callback({data: []});
         return;
     }
@@ -12,7 +12,7 @@ exports.search = function (query, callback) {
     var options = {
         host: 'eutils.ncbi.nlm.nih.gov',
         path: '/entrez/eutils/esearch.fcgi?retmode=json&' +
-            querystring.stringify({term: query})
+            querystring.stringify({term: query.searchTerm})
     };
 
     var httpCallback = function (res) {
@@ -37,7 +37,7 @@ exports.search = function (query, callback) {
             } else {
                 callback({data: []});
                 return;
-            } 
+            }
 
             var options = {
                 host: 'eutils.ncbi.nlm.nih.gov',
@@ -71,7 +71,7 @@ exports.search = function (query, callback) {
                                 });
                             }
                         });
-                    } 
+                    }
 
                     callback({data: result});
                 });
