@@ -6,9 +6,7 @@
     "url": "https://github.com/ucsf-ckm/amalgamatic-pubmed.git"
   },
   "version": "1.0.1",
-  "dependencies": {
-    "cheerio": "^0.17.0"
-  },
+  "dependencies": {},
   "scripts": {
     "test": "node_modules/lab/bin/lab -t 100"
   },
