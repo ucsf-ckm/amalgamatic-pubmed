@@ -1,3 +1,12 @@
+# 2014-09-26
+3 commits against 1 issues, over 4 days [`9926359`](https://github.com/ucsf-ckm/amalgamatic-pubmed/commit/9926359)⎆[`94f01db`](https://github.com/ucsf-ckm/amalgamatic-pubmed/commit/94f01db)
+
+## [**3.0.0**](https://github.com/ucsf-ckm/amalgamatic-pubmed/issues?milestone=3&state=closed)
+- [**#6**](https://github.com/ucsf-ckm/amalgamatic-pubmed/issues/6) first parameter of callback should be error object
+
+---
+
+
 # 2014-09-22
 4 commits against 2 issues, over 3 days [`a1c72c7`](https://github.com/ucsf-ckm/amalgamatic-pubmed/commit/a1c72c7)⎆[`86469c5`](https://github.com/ucsf-ckm/amalgamatic-pubmed/commit/86469c5)
 
