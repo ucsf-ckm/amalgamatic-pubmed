@@ -26,14 +26,16 @@ describe('exports', function () {
 	});
 
 	it('returns an empty result if no search term provided', function (done) {
-		pubmed.search({searchTerm: ''}, function (result) {
+		pubmed.search({searchTerm: ''}, function (err, result) {
+			expect(err).to.be.not.ok;
 			expect(result).to.deep.equal({data:[]});
 			done();
 		});
 	});
 
 	it('returns an empty result if invoked with no first argument', function (done) {
-		pubmed.search(null, function (result) {
+		pubmed.search(null, function (err, result) {
+			expect(err).to.be.not.ok;
 			expect(result).to.deep.equal({data:[]});
 			done();
 		});
@@ -48,8 +50,8 @@ describe('exports', function () {
 			.get('/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&id=25230398%2C25230381')
 			.reply('200', '{"result": {"uids": ["25230398","25230381"], "25230398": {"title": "Medicine 1"}, "25230381": {"title": "Medicine 2"}}}');
 
-		pubmed.search({searchTerm: 'medicine'}, function (result) {
-			expect(result.error).to.be.undefined;
+		pubmed.search({searchTerm: 'medicine'}, function (err, result) {
+			expect(err).to.be.not.ok;
 			expect(result.data.length).to.equal(2);
 			done();
 		});
@@ -60,8 +62,8 @@ describe('exports', function () {
 			.get('/entrez/eutils/esearch.fcgi?retmode=json&term=medicine')
 			.reply('200', '{"fhqwhgads": {"come on": "fhqwhgads"}}');
 
-		pubmed.search({searchTerm: 'medicine'}, function (result) {
-			expect(result.error).to.be.undefined;
+		pubmed.search({searchTerm: 'medicine'}, function (err, result) {
+			expect(err).to.be.not.ok;
 			expect(result.data.length).to.equal(0);
 			done();
 		});
@@ -72,17 +74,17 @@ describe('exports', function () {
 			.get('/entrez/eutils/esearch.fcgi?retmode=json&term=fhqwhgads')
 			.reply('200', '{"esearchresult": {"count": "0","retmax": "0","retstart": "0","idlist": []}}');
 
-		pubmed.search({searchTerm: 'fhqwhgads'}, function (result) {
-			expect(result.error).to.be.undefined;
+		pubmed.search({searchTerm: 'fhqwhgads'}, function (err, result) {
+			expect(err).to.be.not.ok;
 			expect(result.data.length).to.equal(0);
 			done();
 		});
 	});
 
 	it('returns an error if there was an HTTP error', function (done) {
-		pubmed.search({searchTerm: 'medicine'}, function (result) {
-			expect(result.data).to.be.undefined;
-			expect(result.error).to.equal('Nock: Not allow net connect for "eutils.ncbi.nlm.nih.gov:80"');
+		pubmed.search({searchTerm: 'medicine'}, function (err, result) {
+			expect(result).to.be.not.ok;
+			expect(err.message).to.equal('Nock: Not allow net connect for "eutils.ncbi.nlm.nih.gov:80"');
 			done();
 		});
 	});
@@ -92,9 +94,9 @@ describe('exports', function () {
 			.get('/entrez/eutils/esearch.fcgi?retmode=json&term=medicine')
 			.reply('200', '{');
 
-		pubmed.search({searchTerm: 'medicine'}, function (result) {
-			expect(result.data).to.be.undefined;
-			expect(result.error).to.equal('Unexpected end of input');
+		pubmed.search({searchTerm: 'medicine'}, function (err, result) {
+			expect(result).to.be.not.ok;
+			expect(err.message).to.equal('Unexpected end of input');
 			done();
 		});
 	});
@@ -108,9 +110,9 @@ describe('exports', function () {
 			.get('/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&id=25230398%2C25230381')
 			.reply('200', 'fhqwhgads: to the limit');
 
-		pubmed.search({searchTerm: 'medicine'}, function (result) {
-			expect(result.data).to.be.undefined;
-			expect(result.error).to.equal('Unexpected token h');
+		pubmed.search({searchTerm: 'medicine'}, function (err, result) {
+			expect(result).to.be.not.ok;
+			expect(err.message).to.equal('Unexpected token h');
 			done();
 		});
 	});
@@ -124,8 +126,8 @@ describe('exports', function () {
 			.get('/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&id=25230398%2C25230381')
 			.reply('200', '{}');
 
-		pubmed.search({searchTerm: 'medicine'}, function (result) {
-			expect(result.error).to.be.undefined;
+		pubmed.search({searchTerm: 'medicine'}, function (err, result) {
+			expect(err).to.be.not.ok;
 			expect(result.data.length).to.equal(0);
 			done();
 		});
@@ -140,8 +142,8 @@ describe('exports', function () {
 			.get('/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&id=25230398%2C25230381')
 			.reply('200', '{"result": {"uids": ["25230398","25230381"], "25230381": {"title": "Medicine 2"}}}');
 
-		pubmed.search({searchTerm: 'medicine'}, function (result) {
-			expect(result.error).to.be.undefined;
+		pubmed.search({searchTerm: 'medicine'}, function (err, result) {
+			expect(err).to.be.not.ok;
 			expect(result.data.length).to.equal(1);
 			done();
 		});
@@ -156,8 +158,8 @@ describe('exports', function () {
 			.get('/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&id=25230398%2C25230381')
 			.reply('200', '{"result": {"uids": ["25230398","25230381"], "25230398": {"booktitle": "Medicine 1"}, "25230381": {"booktitle": "Medicine 2"}}}');
 
-		pubmed.search({searchTerm: 'medicine'}, function (result) {
-			expect(result.error).to.be.undefined;
+		pubmed.search({searchTerm: 'medicine'}, function (err, result) {
+			expect(err).to.be.not.ok;
 			expect(result.data.length).to.equal(2);
 			expect(result.data[0].name).to.equal('Medicine 1');
 			expect(result.data[1].name).to.equal('Medicine 2');
@@ -170,9 +172,9 @@ describe('exports', function () {
 			.get('/entrez/eutils/esearch.fcgi?retmode=json&term=medicine')
 			.reply('200', '{"esearchresult": {"count": "2","retmax": "2","retstart": "0","idlist": ["25230398","25230381"]}}');
 
-		pubmed.search({searchTerm: 'medicine'}, function (result) {
-			expect(result.data).to.be.undefined;
-			expect(result.error).to.equal('Nock: Not allow net connect for "eutils.ncbi.nlm.nih.gov:80"');
+		pubmed.search({searchTerm: 'medicine'}, function (err, result) {
+			expect(result).to.be.not.ok;
+			expect(err.message).to.equal('Nock: Not allow net connect for "eutils.ncbi.nlm.nih.gov:80"');
 			done();
 		});
 	});
@@ -186,7 +188,8 @@ describe('exports', function () {
 			.get('/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&id=25230398%2C25230381')
 			.reply('200', '{"result": {"uids": ["25230398","25230381"], "25230398": {"title": "Medicine 1"}, "25230381": {"title": "Medicine 2"}}}');
 
-		pubmed.search({searchTerm: 'medicine'}, function (result) {
+		pubmed.search({searchTerm: 'medicine'}, function (err, result) {
+			expect(err).to.be.not.ok;
 			expect(result.data[0].url.indexOf('25230398') !== -1).to.be.ok;
 			expect(result.data[1].url.indexOf('25230381') !== -1).to.be.ok;
 			done();
