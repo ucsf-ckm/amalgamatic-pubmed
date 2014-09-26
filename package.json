@@ -5,7 +5,7 @@
     "type": "git",
     "url": "https://github.com/ucsf-ckm/amalgamatic-pubmed.git"
   },
-  "version": "2.0.0",
+  "version": "3.0.0",
   "dependencies": {},
   "scripts": {
     "test": "node_modules/lab/bin/lab -t 100"
