@@ -5,7 +5,7 @@ exports.search = function (query, callback) {
     'use strict';
 
     if (! query || ! query.searchTerm) {
-        callback({data: []});
+        callback(null, {data: []});
         return;
     }
 
@@ -27,7 +27,7 @@ exports.search = function (query, callback) {
             try {
                 $ = JSON.parse(rawData).esearchresult || {};
             } catch (e) {
-                callback({error: e.message});
+                callback(e);
                 return;
             }
 
@@ -35,7 +35,7 @@ exports.search = function (query, callback) {
             if ($.idlist instanceof Array && $.idlist.length) {
                 uids = $.idlist.join(',');
             } else {
-                callback({data: []});
+                callback(null, {data: []});
                 return;
             }
 
@@ -58,7 +58,7 @@ exports.search = function (query, callback) {
                     try {
                         $ = JSON.parse(rawData).result || {};
                     } catch (e) {
-                        callback({error: e.message});
+                        callback(e);
                         return;
                     }
                     if ($.uids instanceof Array) {
@@ -73,17 +73,17 @@ exports.search = function (query, callback) {
                         });
                     }
 
-                    callback({data: result});
+                    callback(null, {data: result});
                 });
             })
             .on('error', function (e) {
-                callback({error: e.message});
+                callback(e);
             });
         });
     };
 
     http.get(options, httpCallback)
     .on('error', function (e) {
-        callback({error: e.message});
+        callback(e);
     });
 };
