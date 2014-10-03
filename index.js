@@ -1,5 +1,6 @@
 var querystring = require('querystring');
 var http = require('http');
+var parseString = require('xml2js').parseString;
 
 exports.search = function (query, callback) {
     'use strict';
@@ -91,4 +92,29 @@ exports.search = function (query, callback) {
     .on('error', function (e) {
         callback(e);
     });
+
+    if (query.termSuggestion) {
+        var suggestionOptions = {
+            host: 'eutils.ncbi.nlm.nih.gov',
+            path: '/entrez/eutils/espell.fcgi?term=medisine' +
+                querystring.stringify( {term: query.searchTerm} )
+        };
+
+        http.get(suggestionOptions, function (res) {
+            var xml = '';
+
+            res.on('data', function (chunk) {
+                xml += chunk;
+            });
+
+            res.on('end', function () {
+                parseString(xml, function (err, result) {
+                    console.dir(result);
+                });
+            });
+        })
+        .on('error', function (e) {
+            callback(e); // err....maybe not, eh?
+        });
+    }
 };

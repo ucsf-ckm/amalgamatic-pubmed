@@ -213,4 +213,28 @@ describe('exports', function () {
 		});
 	});
 
+	it('should return suggested terms if requested', function (done) {
+		nock('http://eutils.ncbi.nlm.nih.gov')
+			.get('/entrez/eutils/esearch.fcgi?retmode=json&term=medisine')
+			.reply('200', '{"esearchresult": {"count": "0","retmax": "0","retstart": "0","idlist": []}}');
+
+		nock('http://eutils.ncbi.nlm.nih.gov')
+			.get('/entrez/eutils/espell.fcgi?term=medisine')
+			.reply('200', '<?xml version="1.0"?>\
+<!DOCTYPE eSpellResult PUBLIC "-//NLM//DTD eSpellResult, 23 November 2004//EN" "http://www.ncbi.nlm.nih.gov/entrez/query/DTD/eSpell.dtd">\
+<eSpellResult>\
+	<Database>pubmed</Database>\
+	<Query>medisine</Query>\
+	<CorrectedQuery>medicine</CorrectedQuery>\
+	<SpelledQuery><Original></Original><Replaced>medicine</Replaced></SpelledQuery>\
+	<ERROR/>\
+</eSpellResult>');
+
+		pubmed.search({searchTerm: 'medicine'}, function (err, result) {
+			expect(err).to.be.not.ok;
+			expect(result.data.length).to.equal(0);
+			expect(result.data[0].name).to.equal('Medicine 1');
+			done();
+		});
+	});
 });
