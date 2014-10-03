@@ -64,11 +64,16 @@ exports.search = function (query, callback) {
                     if ($.uids instanceof Array) {
                         $.uids.forEach(function (id) {
                             if ($[id]) {
+                                var name = $[id].title || $[id].booktitle;
+
+                                // Sometimes PubMed returns extraneous HTML entities. See https://github.com/ucsf-ckm/amalgamatic-pubmed/issues/9
+                                name = name.replace(/&lt;.*?&gt;/g, '');
+
                                 result.push({
-                                    name: $[id].title || $[id].booktitle,
+                                    name: name,
                                     url: 'http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=pubmed&cmd=Retrieve&dopt=AbstractPlus&query_hl=2&itool=pubmed_docsum&tool=cdl&otool=cdlotool&' +
                                         querystring.stringify({ list_uids: id })
-                                });
+                                });                                
                             }
                         });
                     }
