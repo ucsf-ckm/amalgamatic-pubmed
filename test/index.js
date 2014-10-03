@@ -196,4 +196,21 @@ describe('exports', function () {
 		});
 	});
 
+	it('omits HTML markup in results', function (done) {
+		nock('http://eutils.ncbi.nlm.nih.gov')
+			.get('/entrez/eutils/esearch.fcgi?retmode=json&term=medicine')
+			.reply('200', '{"esearchresult": {"count": "1","retmax": "1","retstart": "0","idlist": ["25230398"]}}');
+
+		nock('http://eutils.ncbi.nlm.nih.gov')
+			.get('/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&id=25230398')
+			.reply('200', '{"result": {"uids": ["25230398"], "25230398": {"title": "A Simple Method for Establishing Adherent &lt;i&gt;Ex Vivo&lt;/i&gt; Explant Cultures from Human Eye Pathologies for Use in Subsequent Calcium Imaging and Inflammatory Studies."}}}');
+
+		pubmed.search({searchTerm: 'medicine'}, function (err, result) {
+			expect(err).to.be.not.ok;
+			expect(result.data.length).to.equal(1);
+			expect(result.data[0].name).to.equal('A Simple Method for Establishing Adherent Ex Vivo Explant Cultures from Human Eye Pathologies for Use in Subsequent Calcium Imaging and Inflammatory Studies.');
+			done();
+		});
+	});
+
 });
