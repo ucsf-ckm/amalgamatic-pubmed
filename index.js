@@ -1,11 +1,20 @@
 var querystring = require('querystring');
 var http = require('http');
+var parseString = require('xml2js').parseString;
 
 exports.search = function (query, callback) {
     'use strict';
 
+    var final = {};
+    var setter = function (property, value) {
+        final[property] = value;
+        if (final.suggestedTerms && final.data) {
+            callback(null, final);
+        }
+    };
+
     if (! query || ! query.searchTerm) {
-        callback(null, {data: []});
+        callback(null, {data: [], suggestedTerms: []});
         return;
     }
 
@@ -35,7 +44,7 @@ exports.search = function (query, callback) {
             if ($.idlist instanceof Array && $.idlist.length) {
                 uids = $.idlist.join(',');
             } else {
-                callback(null, {data: []});
+                setter('data', []);
                 return;
             }
 
@@ -73,16 +82,18 @@ exports.search = function (query, callback) {
                                     name: name,
                                     url: 'http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=pubmed&cmd=Retrieve&dopt=AbstractPlus&query_hl=2&itool=pubmed_docsum&tool=cdl&otool=cdlotool&' +
                                         querystring.stringify({ list_uids: id })
-                                });                                
+                                });
                             }
                         });
                     }
 
-                    callback(null, {data: result});
+                    setter('data', result);
+
                 });
             })
             .on('error', function (e) {
                 callback(e);
+                return;
             });
         });
     };
@@ -90,5 +101,38 @@ exports.search = function (query, callback) {
     http.get(options, httpCallback)
     .on('error', function (e) {
         callback(e);
+        return;
+    });
+
+    var suggestionOptions = {
+        host: 'eutils.ncbi.nlm.nih.gov',
+        path: '/entrez/eutils/espell.fcgi?' +
+            querystring.stringify( {term: query.searchTerm} )
+    };
+
+    http.get(suggestionOptions, function (res) {
+        var xml = '';
+
+        res.on('data', function (chunk) {
+            xml += chunk;
+        });
+
+        res.on('end', function () {
+            parseString(xml, function (err, result) {
+                var suggestedTerms;
+                if (result && result.eSpellResult && result.eSpellResult.CorrectedQuery) {
+                    suggestedTerms = result.eSpellResult.CorrectedQuery;
+                } else {
+                    suggestedTerms = [];
+                }
+
+                // suggested terms are not essential, so let's not blow up with errors
+                setter('suggestedTerms', suggestedTerms);
+            });
+        });
+    })
+    .on('error', function () {
+        // suggested terms are not essential, so let's not blow up the whole thing
+        setter('suggestedTerms', []);
     });
 };
