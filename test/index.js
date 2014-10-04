@@ -10,12 +10,12 @@ var lab = exports.lab = Lab.script();
 var expect = Lab.expect;
 var describe = lab.experiment;
 var it = lab.test;
-var before = lab.before;
+var beforeEach = lab.before;
 var afterEach = lab.afterEach;
 
 describe('exports', function () {
 
-	before(function (done) {
+	beforeEach(function (done) {
 		nock.disableNetConnect();
 		done();
 	});
@@ -25,10 +25,12 @@ describe('exports', function () {
 		done();
 	});
 
+	var emptyResult = {suggestedTerms: [], data: []};
+
 	it('returns an empty result if no search term provided', function (done) {
 		pubmed.search({searchTerm: ''}, function (err, result) {
 			expect(err).to.be.not.ok;
-			expect(result).to.deep.equal({data:[]});
+			expect(result).to.deep.equal(emptyResult);
 			done();
 		});
 	});
@@ -36,7 +38,7 @@ describe('exports', function () {
 	it('returns an empty result if invoked with no first argument', function (done) {
 		pubmed.search(null, function (err, result) {
 			expect(err).to.be.not.ok;
-			expect(result).to.deep.equal({data:[]});
+			expect(result).to.deep.equal(emptyResult);
 			done();
 		});
 	});
@@ -82,8 +84,7 @@ describe('exports', function () {
 	});
 
 	it('returns an error if there was an HTTP error', function (done) {
-		pubmed.search({searchTerm: 'medicine'}, function (err, result) {
-			expect(result).to.be.not.ok;
+		pubmed.search({searchTerm: 'medicine'}, function (err) {
 			expect(err.message).to.equal('Nock: Not allow net connect for "eutils.ncbi.nlm.nih.gov:80"');
 			done();
 		});
@@ -94,8 +95,7 @@ describe('exports', function () {
 			.get('/entrez/eutils/esearch.fcgi?retmode=json&term=medicine')
 			.reply('200', '{');
 
-		pubmed.search({searchTerm: 'medicine'}, function (err, result) {
-			expect(result).to.be.not.ok;
+		pubmed.search({searchTerm: 'medicine'}, function (err) {
 			expect(err.message).to.equal('Unexpected end of input');
 			done();
 		});
@@ -110,8 +110,7 @@ describe('exports', function () {
 			.get('/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&id=25230398%2C25230381')
 			.reply('200', 'fhqwhgads: to the limit');
 
-		pubmed.search({searchTerm: 'medicine'}, function (err, result) {
-			expect(result).to.be.not.ok;
+		pubmed.search({searchTerm: 'medicine'}, function (err) {
 			expect(err.message).to.equal('Unexpected token h');
 			done();
 		});
@@ -172,8 +171,7 @@ describe('exports', function () {
 			.get('/entrez/eutils/esearch.fcgi?retmode=json&term=medicine')
 			.reply('200', '{"esearchresult": {"count": "2","retmax": "2","retstart": "0","idlist": ["25230398","25230381"]}}');
 
-		pubmed.search({searchTerm: 'medicine'}, function (err, result) {
-			expect(result).to.be.not.ok;
+		pubmed.search({searchTerm: 'medicine'}, function (err) {
 			expect(err.message).to.equal('Nock: Not allow net connect for "eutils.ncbi.nlm.nih.gov:80"');
 			done();
 		});
@@ -213,27 +211,52 @@ describe('exports', function () {
 		});
 	});
 
-	it('should return suggested terms if requested', function (done) {
+	it('should return suggested terms', function (done) {
+
 		nock('http://eutils.ncbi.nlm.nih.gov')
 			.get('/entrez/eutils/esearch.fcgi?retmode=json&term=medisine')
 			.reply('200', '{"esearchresult": {"count": "0","retmax": "0","retstart": "0","idlist": []}}');
 
 		nock('http://eutils.ncbi.nlm.nih.gov')
 			.get('/entrez/eutils/espell.fcgi?term=medisine')
-			.reply('200', '<?xml version="1.0"?>\
-<!DOCTYPE eSpellResult PUBLIC "-//NLM//DTD eSpellResult, 23 November 2004//EN" "http://www.ncbi.nlm.nih.gov/entrez/query/DTD/eSpell.dtd">\
-<eSpellResult>\
-	<Database>pubmed</Database>\
-	<Query>medisine</Query>\
-	<CorrectedQuery>medicine</CorrectedQuery>\
-	<SpelledQuery><Original></Original><Replaced>medicine</Replaced></SpelledQuery>\
-	<ERROR/>\
-</eSpellResult>');
+			.replyWithFile('200', __dirname + '/fixtures/oneSuggestion.xml');
 
-		pubmed.search({searchTerm: 'medicine'}, function (err, result) {
+		pubmed.search({searchTerm: 'medisine'}, function (err, result) {
 			expect(err).to.be.not.ok;
 			expect(result.data.length).to.equal(0);
-			expect(result.data[0].name).to.equal('Medicine 1');
+			expect(result.suggestedTerms).to.deep.equal(['medicine']);
+			done();
+		});
+	});
+
+	it('should return empty suggested terms if XML is malformed', function (done) {
+		nock('http://eutils.ncbi.nlm.nih.gov')
+			.get('/entrez/eutils/esearch.fcgi?retmode=json&term=medisine')
+			.reply('200', '{"esearchresult": {"count": "0","retmax": "0","retstart": "0","idlist": []}}');
+
+		nock('http://eutils.ncbi.nlm.nih.gov')
+			.get('/entrez/eutils/espell.fcgi?term=medisine')
+			.reply('200', '<malformed');
+
+		pubmed.search({searchTerm: 'medisine'}, function (err, result) {
+			expect(err).to.be.not.ok;
+			expect(result).to.deep.equal(emptyResult);
+			done();
+		});
+	});
+
+	it('should return empty suggested terms if eSpellResult is missing CorrectedQuery', function (done) {
+		nock('http://eutils.ncbi.nlm.nih.gov')
+			.get('/entrez/eutils/esearch.fcgi?retmode=json&term=medisine')
+			.reply('200', '{"esearchresult": {"count": "0","retmax": "0","retstart": "0","idlist": []}}');
+
+		nock('http://eutils.ncbi.nlm.nih.gov')
+			.get('/entrez/eutils/espell.fcgi?term=medisine')
+			.reply('200', '<eSpellResult/>');
+
+		pubmed.search({searchTerm: 'medisine'}, function (err, result) {
+			expect(err).to.be.not.ok;
+			expect(result).to.deep.equal(emptyResult);
 			done();
 		});
 	});
