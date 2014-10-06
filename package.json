@@ -5,7 +5,7 @@
     "type": "git",
     "url": "https://github.com/ucsf-ckm/amalgamatic-pubmed.git"
   },
-  "version": "3.1.0",
+  "version": "3.1.1",
   "dependencies": {
     "xml2js": "^0.4.4"
   },
