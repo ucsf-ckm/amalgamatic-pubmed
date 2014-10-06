@@ -20,5 +20,8 @@
     "lab": "^4.4.4",
     "nock": "^0.47.0",
     "precommit-hook": "^1.0.7"
-  }
+  },
+  "keywords": [
+    "amalgamatic-plugin"
+  ]
 }
