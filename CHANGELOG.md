@@ -1,3 +1,13 @@
+# 2014-10-06
+4 commits against 2 issues, over 2 days [`f4164d6`](https://github.com/ucsf-ckm/amalgamatic-pubmed/commit/f4164d6)⎆[`7f34fe0`](https://github.com/ucsf-ckm/amalgamatic-pubmed/commit/7f34fe0)
+
+## [**3.1.1**](https://github.com/ucsf-ckm/amalgamatic-pubmed/issues?milestone=5&state=closed)
+- [**#14**](https://github.com/ucsf-ckm/amalgamatic-pubmed/issues/14) add keywords to package.json, closes #13
+- [**#13**](https://github.com/ucsf-ckm/amalgamatic-pubmed/issues/13) add amalgamatic-plugin to keywords in package.json
+
+---
+
+
 # 2014-10-04
 8 commits against 6 issues, over 8 days [`a13b777`](https://github.com/ucsf-ckm/amalgamatic-pubmed/commit/a13b777)⎆[`a9347fb`](https://github.com/ucsf-ckm/amalgamatic-pubmed/commit/a9347fb)
 
