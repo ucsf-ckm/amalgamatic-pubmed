@@ -21,6 +21,7 @@ describe('exports', function () {
 	});
 
 	afterEach(function (done) {
+		pubmed.setOptions({tool: 'cdl', otool: 'cdlotool'});
 		nock.cleanAll();
 		done();
 	});
@@ -239,7 +240,7 @@ describe('exports', function () {
 
 		pubmed.search({searchTerm: 'medisine'}, function (err, result) {
 			expect(err).to.be.not.ok;
-			expect(result).to.deep.equal(emptyResult);
+			expect(result.suggestedTerms).to.deep.equal([]);
 			done();
 		});
 	});
@@ -255,7 +256,7 @@ describe('exports', function () {
 
 		pubmed.search({searchTerm: 'medisine'}, function (err, result) {
 			expect(err).to.be.not.ok;
-			expect(result).to.deep.equal(emptyResult);
+			expect(result.suggestedTerms).to.deep.equal([]);
 			done();
 		});
 	});
@@ -274,6 +275,22 @@ describe('exports', function () {
 		pubmed.search({searchTerm: 'medicine'}, function (err, result) {
 			expect(err).to.be.not.ok;
 			expect(result.data).to.deep.equal([{name: 'Medicine 1', url: 'http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=pubmed&cmd=Retrieve&dopt=AbstractPlus&query_hl=2&itool=pubmed_docsum&tool=foo&otool=bar&list_uids=25230398'}]);
+			done();
+		});
+	});
+
+	it('should return a link to the PubMed search results page', function (done) {
+		nock('http://eutils.ncbi.nlm.nih.gov')
+			.get('/entrez/eutils/esearch.fcgi?retmode=json&term=medicine')
+			.reply(200, '{"esearchresult": {"count": "1","retmax": "1","retstart": "0","idlist": ["25230398"]}}');
+
+		nock('http://eutils.ncbi.nlm.nih.gov')
+			.get('/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&id=25230398')
+			.reply(200, '{"result": {"uids": ["25230398"], "25230398": {"title": "Medicine 1"}}}');
+
+		pubmed.search({searchTerm: 'medicine'}, function (err, result) {
+			expect(err).to.be.not.ok;
+			expect(result.url).to.equal('http://www.ncbi.nlm.nih.gov/pubmed?tool=cdl&otool=cdlotool&cmd=search&term=medicine');
 			done();
 		});
 	});
