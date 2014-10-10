@@ -1,3 +1,18 @@
+# 2014-10-10
+6 commits against 4 issues, over 4 days [`0a233bb`](https://github.com/ucsf-ckm/amalgamatic-pubmed/commit/0a233bb)⎆[`67ca52b`](https://github.com/ucsf-ckm/amalgamatic-pubmed/commit/67ca52b)
+
+## [**3.2.0**](https://github.com/ucsf-ckm/amalgamatic-pubmed/issues?milestone=6&state=closed)
+- [**#15**](https://github.com/ucsf-ckm/amalgamatic-pubmed/issues/15) &quot;All Results&quot; link
+- [**#16**](https://github.com/ucsf-ckm/amalgamatic-pubmed/issues/16) allow tool and otool options, closes #5
+- [**#5**](https://github.com/ucsf-ckm/amalgamatic-pubmed/issues/5) enable configuration options
+
+
+## Issues
+- [**#17**](https://github.com/ucsf-ckm/amalgamatic-pubmed/issues/17) return link to all results, closes #15
+
+---
+
+
 # 2014-10-06
 4 commits against 2 issues, over 2 days [`f4164d6`](https://github.com/ucsf-ckm/amalgamatic-pubmed/commit/f4164d6)⎆[`7f34fe0`](https://github.com/ucsf-ckm/amalgamatic-pubmed/commit/7f34fe0)
 
