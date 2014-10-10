@@ -46,11 +46,11 @@ describe('exports', function () {
 	it('returns results if a non-ridiculous search term is provided', function (done) {
 		nock('http://eutils.ncbi.nlm.nih.gov')
 			.get('/entrez/eutils/esearch.fcgi?retmode=json&term=medicine')
-			.reply('200', '{"esearchresult": {"count": "2","retmax": "2","retstart": "0","idlist": ["25230398","25230381"]}}');
+			.reply(200, '{"esearchresult": {"count": "2","retmax": "2","retstart": "0","idlist": ["25230398","25230381"]}}');
 
 		nock('http://eutils.ncbi.nlm.nih.gov')
 			.get('/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&id=25230398%2C25230381')
-			.reply('200', '{"result": {"uids": ["25230398","25230381"], "25230398": {"title": "Medicine 1"}, "25230381": {"title": "Medicine 2"}}}');
+			.reply(200, '{"result": {"uids": ["25230398","25230381"], "25230398": {"title": "Medicine 1"}, "25230381": {"title": "Medicine 2"}}}');
 
 		pubmed.search({searchTerm: 'medicine'}, function (err, result) {
 			expect(err).to.be.not.ok;
@@ -62,7 +62,7 @@ describe('exports', function () {
 	it('returns results an empty result if there is no esearchresult in JSON', function (done) {
 		nock('http://eutils.ncbi.nlm.nih.gov')
 			.get('/entrez/eutils/esearch.fcgi?retmode=json&term=medicine')
-			.reply('200', '{"fhqwhgads": {"come on": "fhqwhgads"}}');
+			.reply(200, '{"fhqwhgads": {"come on": "fhqwhgads"}}');
 
 		pubmed.search({searchTerm: 'medicine'}, function (err, result) {
 			expect(err).to.be.not.ok;
@@ -74,7 +74,7 @@ describe('exports', function () {
 	it('returns an empty result if ridiculous search term is provided', function (done) {
 		nock('http://eutils.ncbi.nlm.nih.gov')
 			.get('/entrez/eutils/esearch.fcgi?retmode=json&term=fhqwhgads')
-			.reply('200', '{"esearchresult": {"count": "0","retmax": "0","retstart": "0","idlist": []}}');
+			.reply(200, '{"esearchresult": {"count": "0","retmax": "0","retstart": "0","idlist": []}}');
 
 		pubmed.search({searchTerm: 'fhqwhgads'}, function (err, result) {
 			expect(err).to.be.not.ok;
@@ -93,7 +93,7 @@ describe('exports', function () {
 	it('returns an error if it receives invalid JSON on the first HTTP GET', function (done) {
 		nock('http://eutils.ncbi.nlm.nih.gov')
 			.get('/entrez/eutils/esearch.fcgi?retmode=json&term=medicine')
-			.reply('200', '{');
+			.reply(200, '{');
 
 		pubmed.search({searchTerm: 'medicine'}, function (err) {
 			expect(err.message).to.equal('Unexpected end of input');
@@ -104,11 +104,11 @@ describe('exports', function () {
 	it('returns an error if it receives invalid JSON on the second HTTP GET', function (done) {
 		nock('http://eutils.ncbi.nlm.nih.gov')
 			.get('/entrez/eutils/esearch.fcgi?retmode=json&term=medicine')
-			.reply('200', '{"esearchresult": {"count": "2","retmax": "2","retstart": "0","idlist": ["25230398","25230381"]}}');
+			.reply(200, '{"esearchresult": {"count": "2","retmax": "2","retstart": "0","idlist": ["25230398","25230381"]}}');
 
 		nock('http://eutils.ncbi.nlm.nih.gov')
 			.get('/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&id=25230398%2C25230381')
-			.reply('200', 'fhqwhgads: to the limit');
+			.reply(200, 'fhqwhgads: to the limit');
 
 		pubmed.search({searchTerm: 'medicine'}, function (err) {
 			expect(err.message).to.equal('Unexpected token h');
@@ -119,11 +119,11 @@ describe('exports', function () {
 	it('returns empty results if there is no result property in the second HTTP GET', function (done) {
 		nock('http://eutils.ncbi.nlm.nih.gov')
 			.get('/entrez/eutils/esearch.fcgi?retmode=json&term=medicine')
-			.reply('200', '{"esearchresult": {"count": "2","retmax": "2","retstart": "0","idlist": ["25230398","25230381"]}}');
+			.reply(200, '{"esearchresult": {"count": "2","retmax": "2","retstart": "0","idlist": ["25230398","25230381"]}}');
 
 		nock('http://eutils.ncbi.nlm.nih.gov')
 			.get('/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&id=25230398%2C25230381')
-			.reply('200', '{}');
+			.reply(200, '{}');
 
 		pubmed.search({searchTerm: 'medicine'}, function (err, result) {
 			expect(err).to.be.not.ok;
@@ -135,11 +135,11 @@ describe('exports', function () {
 	it('gracefully omits IDs in index that are not in the actual object', function (done) {
 		nock('http://eutils.ncbi.nlm.nih.gov')
 			.get('/entrez/eutils/esearch.fcgi?retmode=json&term=medicine')
-			.reply('200', '{"esearchresult": {"count": "2","retmax": "2","retstart": "0","idlist": ["25230398","25230381"]}}');
+			.reply(200, '{"esearchresult": {"count": "2","retmax": "2","retstart": "0","idlist": ["25230398","25230381"]}}');
 
 		nock('http://eutils.ncbi.nlm.nih.gov')
 			.get('/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&id=25230398%2C25230381')
-			.reply('200', '{"result": {"uids": ["25230398","25230381"], "25230381": {"title": "Medicine 2"}}}');
+			.reply(200, '{"result": {"uids": ["25230398","25230381"], "25230381": {"title": "Medicine 2"}}}');
 
 		pubmed.search({searchTerm: 'medicine'}, function (err, result) {
 			expect(err).to.be.not.ok;
@@ -151,11 +151,11 @@ describe('exports', function () {
 	it('uses booktitle property when title property is not present', function (done) {
 		nock('http://eutils.ncbi.nlm.nih.gov')
 			.get('/entrez/eutils/esearch.fcgi?retmode=json&term=medicine')
-			.reply('200', '{"esearchresult": {"count": "2","retmax": "2","retstart": "0","idlist": ["25230398","25230381"]}}');
+			.reply(200, '{"esearchresult": {"count": "2","retmax": "2","retstart": "0","idlist": ["25230398","25230381"]}}');
 
 		nock('http://eutils.ncbi.nlm.nih.gov')
 			.get('/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&id=25230398%2C25230381')
-			.reply('200', '{"result": {"uids": ["25230398","25230381"], "25230398": {"booktitle": "Medicine 1"}, "25230381": {"booktitle": "Medicine 2"}}}');
+			.reply(200, '{"result": {"uids": ["25230398","25230381"], "25230398": {"booktitle": "Medicine 1"}, "25230381": {"booktitle": "Medicine 2"}}}');
 
 		pubmed.search({searchTerm: 'medicine'}, function (err, result) {
 			expect(err).to.be.not.ok;
@@ -169,7 +169,7 @@ describe('exports', function () {
 	it('returns an error if the second HTTP GET results in an HTTP error', function (done) {
 		nock('http://eutils.ncbi.nlm.nih.gov')
 			.get('/entrez/eutils/esearch.fcgi?retmode=json&term=medicine')
-			.reply('200', '{"esearchresult": {"count": "2","retmax": "2","retstart": "0","idlist": ["25230398","25230381"]}}');
+			.reply(200, '{"esearchresult": {"count": "2","retmax": "2","retstart": "0","idlist": ["25230398","25230381"]}}');
 
 		pubmed.search({searchTerm: 'medicine'}, function (err) {
 			expect(err.message).to.equal('Nock: Not allow net connect for "eutils.ncbi.nlm.nih.gov:80"');
@@ -180,11 +180,11 @@ describe('exports', function () {
 	it('returns URLs that include the returned UIDs', function (done) {
 		nock('http://eutils.ncbi.nlm.nih.gov')
 			.get('/entrez/eutils/esearch.fcgi?retmode=json&term=medicine')
-			.reply('200', '{"esearchresult": {"count": "2","retmax": "2","retstart": "0","idlist": ["25230398","25230381"]}}');
+			.reply(200, '{"esearchresult": {"count": "2","retmax": "2","retstart": "0","idlist": ["25230398","25230381"]}}');
 
 		nock('http://eutils.ncbi.nlm.nih.gov')
 			.get('/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&id=25230398%2C25230381')
-			.reply('200', '{"result": {"uids": ["25230398","25230381"], "25230398": {"title": "Medicine 1"}, "25230381": {"title": "Medicine 2"}}}');
+			.reply(200, '{"result": {"uids": ["25230398","25230381"], "25230398": {"title": "Medicine 1"}, "25230381": {"title": "Medicine 2"}}}');
 
 		pubmed.search({searchTerm: 'medicine'}, function (err, result) {
 			expect(err).to.be.not.ok;
@@ -197,11 +197,11 @@ describe('exports', function () {
 	it('omits HTML markup in results', function (done) {
 		nock('http://eutils.ncbi.nlm.nih.gov')
 			.get('/entrez/eutils/esearch.fcgi?retmode=json&term=medicine')
-			.reply('200', '{"esearchresult": {"count": "1","retmax": "1","retstart": "0","idlist": ["25230398"]}}');
+			.reply(200, '{"esearchresult": {"count": "1","retmax": "1","retstart": "0","idlist": ["25230398"]}}');
 
 		nock('http://eutils.ncbi.nlm.nih.gov')
 			.get('/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&id=25230398')
-			.reply('200', '{"result": {"uids": ["25230398"], "25230398": {"title": "A Simple Method for Establishing Adherent &lt;i&gt;Ex Vivo&lt;/i&gt; Explant Cultures from Human Eye Pathologies for Use in Subsequent Calcium Imaging and Inflammatory Studies."}}}');
+			.reply(200, '{"result": {"uids": ["25230398"], "25230398": {"title": "A Simple Method for Establishing Adherent &lt;i&gt;Ex Vivo&lt;/i&gt; Explant Cultures from Human Eye Pathologies for Use in Subsequent Calcium Imaging and Inflammatory Studies."}}}');
 
 		pubmed.search({searchTerm: 'medicine'}, function (err, result) {
 			expect(err).to.be.not.ok;
@@ -212,14 +212,13 @@ describe('exports', function () {
 	});
 
 	it('should return suggested terms', function (done) {
-
 		nock('http://eutils.ncbi.nlm.nih.gov')
 			.get('/entrez/eutils/esearch.fcgi?retmode=json&term=medisine')
-			.reply('200', '{"esearchresult": {"count": "0","retmax": "0","retstart": "0","idlist": []}}');
+			.reply(200, '{"esearchresult": {"count": "0","retmax": "0","retstart": "0","idlist": []}}');
 
 		nock('http://eutils.ncbi.nlm.nih.gov')
 			.get('/entrez/eutils/espell.fcgi?term=medisine')
-			.replyWithFile('200', __dirname + '/fixtures/oneSuggestion.xml');
+			.replyWithFile(200, __dirname + '/fixtures/oneSuggestion.xml');
 
 		pubmed.search({searchTerm: 'medisine'}, function (err, result) {
 			expect(err).to.be.not.ok;
@@ -232,11 +231,11 @@ describe('exports', function () {
 	it('should return empty suggested terms if XML is malformed', function (done) {
 		nock('http://eutils.ncbi.nlm.nih.gov')
 			.get('/entrez/eutils/esearch.fcgi?retmode=json&term=medisine')
-			.reply('200', '{"esearchresult": {"count": "0","retmax": "0","retstart": "0","idlist": []}}');
+			.reply(200, '{"esearchresult": {"count": "0","retmax": "0","retstart": "0","idlist": []}}');
 
 		nock('http://eutils.ncbi.nlm.nih.gov')
 			.get('/entrez/eutils/espell.fcgi?term=medisine')
-			.reply('200', '<malformed');
+			.reply(200, '<malformed');
 
 		pubmed.search({searchTerm: 'medisine'}, function (err, result) {
 			expect(err).to.be.not.ok;
@@ -248,15 +247,33 @@ describe('exports', function () {
 	it('should return empty suggested terms if eSpellResult is missing CorrectedQuery', function (done) {
 		nock('http://eutils.ncbi.nlm.nih.gov')
 			.get('/entrez/eutils/esearch.fcgi?retmode=json&term=medisine')
-			.reply('200', '{"esearchresult": {"count": "0","retmax": "0","retstart": "0","idlist": []}}');
+			.reply(200, '{"esearchresult": {"count": "0","retmax": "0","retstart": "0","idlist": []}}');
 
 		nock('http://eutils.ncbi.nlm.nih.gov')
 			.get('/entrez/eutils/espell.fcgi?term=medisine')
-			.reply('200', '<eSpellResult/>');
+			.reply(200, '<eSpellResult/>');
 
 		pubmed.search({searchTerm: 'medisine'}, function (err, result) {
 			expect(err).to.be.not.ok;
 			expect(result).to.deep.equal(emptyResult);
+			done();
+		});
+	});
+
+	it('should accept tool and otool options', function (done) {
+		nock('http://eutils.ncbi.nlm.nih.gov')
+			.get('/entrez/eutils/esearch.fcgi?retmode=json&term=medicine')
+			.reply(200, '{"esearchresult": {"count": "1","retmax": "1","retstart": "0","idlist": ["25230398"]}}');
+
+		nock('http://eutils.ncbi.nlm.nih.gov')
+			.get('/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&id=25230398')
+			.reply(200, '{"result": {"uids": ["25230398"], "25230398": {"title": "Medicine 1"}}}');
+
+		pubmed.setOptions({tool: 'foo', otool: 'bar'});
+		
+		pubmed.search({searchTerm: 'medicine'}, function (err, result) {
+			expect(err).to.be.not.ok;
+			expect(result.data).to.deep.equal([{name: 'Medicine 1', url: 'http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=pubmed&cmd=Retrieve&dopt=AbstractPlus&query_hl=2&itool=pubmed_docsum&tool=foo&otool=bar&list_uids=25230398'}]);
 			done();
 		});
 	});
