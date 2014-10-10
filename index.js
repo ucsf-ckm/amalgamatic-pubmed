@@ -1,6 +1,16 @@
 var querystring = require('querystring');
 var http = require('http');
 var parseString = require('xml2js').parseString;
+var extend = require('util-extend');
+
+var options = {
+    tool: 'cdl',
+    otool: 'cdlotool'
+};
+
+exports.setOptions = function (newOptions) {
+    options = extend(options, newOptions);
+};
 
 exports.search = function (query, callback) {
     'use strict';
@@ -18,11 +28,8 @@ exports.search = function (query, callback) {
         return;
     }
 
-    var options = {
-        host: 'eutils.ncbi.nlm.nih.gov',
-        path: '/entrez/eutils/esearch.fcgi?retmode=json&' +
-            querystring.stringify({term: query.searchTerm})
-    };
+    var myUrl = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?retmode=json&' +
+            querystring.stringify({term: query.searchTerm});
 
     var httpCallback = function (res) {
         var rawData = '';
@@ -48,13 +55,10 @@ exports.search = function (query, callback) {
                 return;
             }
 
-            var options = {
-                host: 'eutils.ncbi.nlm.nih.gov',
-                path: '/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&' +
-                    querystring.stringify( {id: uids} )
-            };
+            var myUrl = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&' +
+                    querystring.stringify( {id: uids} );
 
-            http.get(options, function (res) {
+            http.get(myUrl, function (res) {
                 var rawData = '';
                 var result = [];
 
@@ -72,6 +76,7 @@ exports.search = function (query, callback) {
                     }
                     if ($.uids instanceof Array) {
                         $.uids.forEach(function (id) {
+                            var myOptions = extend(options, { list_uids: id });
                             if ($[id]) {
                                 var name = $[id].title || $[id].booktitle;
 
@@ -80,8 +85,8 @@ exports.search = function (query, callback) {
 
                                 result.push({
                                     name: name,
-                                    url: 'http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=pubmed&cmd=Retrieve&dopt=AbstractPlus&query_hl=2&itool=pubmed_docsum&tool=cdl&otool=cdlotool&' +
-                                        querystring.stringify({ list_uids: id })
+                                    url: 'http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=pubmed&cmd=Retrieve&dopt=AbstractPlus&query_hl=2&itool=pubmed_docsum&' +
+                                        querystring.stringify(myOptions)
                                 });
                             }
                         });
@@ -98,19 +103,16 @@ exports.search = function (query, callback) {
         });
     };
 
-    http.get(options, httpCallback)
+    http.get(myUrl, httpCallback)
     .on('error', function (e) {
         callback(e);
         return;
     });
 
-    var suggestionOptions = {
-        host: 'eutils.ncbi.nlm.nih.gov',
-        path: '/entrez/eutils/espell.fcgi?' +
-            querystring.stringify( {term: query.searchTerm} )
-    };
+    var suggestionUrl = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/espell.fcgi?' +
+            querystring.stringify( {term: query.searchTerm} );
 
-    http.get(suggestionOptions, function (res) {
+    http.get(suggestionUrl, function (res) {
         var xml = '';
 
         res.on('data', function (chunk) {
