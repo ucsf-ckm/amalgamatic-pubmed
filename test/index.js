@@ -1,6 +1,8 @@
 /*jshint expr: true*/
 
-var pubmed = require('../index.js');
+var rewire = require('rewire');
+
+var pubmed = rewire('../index.js');
 
 var nock = require('nock');
 
@@ -13,6 +15,8 @@ var it = lab.test;
 var beforeEach = lab.before;
 var afterEach = lab.afterEach;
 
+var revert;
+
 describe('exports', function () {
 
 	beforeEach(function (done) {
@@ -23,6 +27,10 @@ describe('exports', function () {
 	afterEach(function (done) {
 		pubmed.setOptions({tool: 'cdl', otool: 'cdlotool'});
 		nock.cleanAll();
+		if (revert) {
+			revert();
+			revert = null;
+		}
 		done();
 	});
 
@@ -293,5 +301,18 @@ describe('exports', function () {
 			expect(result.url).to.equal('http://www.ncbi.nlm.nih.gov/pubmed?tool=cdl&otool=cdlotool&cmd=search&term=medicine');
 			done();
 		});
+	});
+	it('should set withCredentials to false for browserify', function (done) {
+		var count = 0;
+		revert = pubmed.__set__({http: {get: function (options) {
+			expect(options.withCredentials).to.be.false;
+			count++;
+			if (count === 2) {
+				done();
+			}
+			return {on: function () {}};
+		}}});
+
+		pubmed.search({searchTerm: 'medicine'});
 	});
 });
