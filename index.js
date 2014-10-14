@@ -3,10 +3,17 @@ var http = require('http');
 var parseString = require('xml2js').parseString;
 var extend = require('util-extend');
 var async = require('async');
+var url = require('url');
 
 var options = {
     tool: 'cdl',
     otool: 'cdlotool'
+};
+
+var makeBrowserifyOptions = function (myUrl) {
+    var myOptions = url.parse(myUrl);
+    myOptions.withCredentials = false;
+    return myOptions;
 };
 
 exports.setOptions = function (newOptions) {
@@ -53,7 +60,7 @@ exports.search = function (query, callback) {
                 var myUrl = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&' +
                         querystring.stringify( {id: uids} );
 
-                http.get(myUrl, function (res) {
+                http.get(makeBrowserifyOptions(myUrl), function (res) {
                     var rawData = '';
                     var result = [];
 
@@ -99,7 +106,7 @@ exports.search = function (query, callback) {
             });
         };
 
-        http.get(myUrl, httpCallback)
+        http.get(makeBrowserifyOptions(myUrl), httpCallback)
         .on('error', function (e) {
             done(e);
             return;
@@ -110,7 +117,7 @@ exports.search = function (query, callback) {
         var suggestionUrl = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/espell.fcgi?' +
                 querystring.stringify( {term: query.searchTerm} );
 
-        http.get(suggestionUrl, function (res) {
+        http.get(makeBrowserifyOptions(suggestionUrl), function (res) {
             var xml = '';
 
             res.on('data', function (chunk) {
