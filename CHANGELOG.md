@@ -1,4 +1,8 @@
 
+## [**3.2.2**](https://github.com/ucsf-ckm/amalgamatic-pubmed/issues?milestone=8&state=closed)
+- [**#1**](https://github.com/ucsf-ckm/amalgamatic-pubmed/issues/1) Document usage
+- [**#7**](https://github.com/ucsf-ckm/amalgamatic-pubmed/issues/7) Travis-CI
+
 ## [**3.2.1**](https://github.com/ucsf-ckm/amalgamatic-pubmed/issues?milestone=7&state=closed)
 - [**#18**](https://github.com/ucsf-ckm/amalgamatic-pubmed/issues/18) withCredentials default to false for browserify
 
