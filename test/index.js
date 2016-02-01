@@ -9,7 +9,9 @@ var nock = require('nock');
 var Lab = require('lab');
 var lab = exports.lab = Lab.script();
 
-var expect = Lab.expect;
+var Code = require('code');
+
+var expect = Code.expect;
 var describe = lab.experiment;
 var it = lab.test;
 var beforeEach = lab.before;
