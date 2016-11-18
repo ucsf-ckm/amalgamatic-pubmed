@@ -1,5 +1,5 @@
 var querystring = require('querystring');
-var http = require('http');
+var https = require('https');
 var parseString = require('xml2js').parseString;
 var extend = require('util-extend');
 var async = require('async');
@@ -30,10 +30,10 @@ exports.search = function (query, callback) {
 
     var dataTask = function (done) {
 
-        var myUrl = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?retmode=json&' +
+        var myUrl = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?retmode=json&' +
                 querystring.stringify({term: query.searchTerm});
 
-        var httpCallback = function (res) {
+        var httpsCallback = function (res) {
             var rawData = '';
 
             res.on('data', function (chunk) {
@@ -57,10 +57,10 @@ exports.search = function (query, callback) {
                     return;
                 }
 
-                var myUrl = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&' +
+                var myUrl = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&' +
                         querystring.stringify( {id: uids} );
 
-                http.get(makeBrowserifyOptions(myUrl), function (res) {
+                https.get(makeBrowserifyOptions(myUrl), function (res) {
                     var rawData = '';
                     var result = [];
 
@@ -86,7 +86,7 @@ exports.search = function (query, callback) {
 
                                     result.push({
                                         name: name,
-                                        url: 'http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=pubmed&cmd=Retrieve&dopt=AbstractPlus&query_hl=2&itool=pubmed_docsum&' +
+                                        url: 'https://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=pubmed&cmd=Retrieve&dopt=AbstractPlus&query_hl=2&itool=pubmed_docsum&' +
                                             querystring.stringify(options) + '&' +
                                             querystring.stringify({ list_uids: id })
                                     });
@@ -106,7 +106,7 @@ exports.search = function (query, callback) {
             });
         };
 
-        http.get(makeBrowserifyOptions(myUrl), httpCallback)
+        https.get(makeBrowserifyOptions(myUrl), httpsCallback)
         .on('error', function (e) {
             done(e);
             return;
@@ -114,10 +114,10 @@ exports.search = function (query, callback) {
     };
 
     var suggestedTermsTask = function (done) {
-        var suggestionUrl = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/espell.fcgi?' +
+        var suggestionUrl = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/espell.fcgi?' +
                 querystring.stringify( {term: query.searchTerm} );
 
-        http.get(makeBrowserifyOptions(suggestionUrl), function (res) {
+        https.get(makeBrowserifyOptions(suggestionUrl), function (res) {
             var xml = '';
 
             res.on('data', function (chunk) {
@@ -145,7 +145,7 @@ exports.search = function (query, callback) {
     };
 
     async.parallel({data: dataTask, suggestedTerms: suggestedTermsTask}, function (err, results) {
-        results.url = 'http://www.ncbi.nlm.nih.gov/pubmed?' +
+        results.url = 'https://www.ncbi.nlm.nih.gov/pubmed?' +
             querystring.stringify(options) + '&' +
             querystring.stringify({ cmd: 'search', term: query.searchTerm});
         callback(err, results);
