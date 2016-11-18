@@ -41,7 +41,7 @@ describe('exports', function () {
 	it('returns an empty result if no search term provided', function (done) {
 		pubmed.search({searchTerm: ''}, function (err, result) {
 			expect(err).to.be.not.ok;
-			expect(result).to.deep.equal(emptyResult);
+			expect(result).to.equal(emptyResult);
 			done();
 		});
 	});
@@ -49,7 +49,7 @@ describe('exports', function () {
 	it('returns an empty result if invoked with no first argument', function (done) {
 		pubmed.search(null, function (err, result) {
 			expect(err).to.be.not.ok;
-			expect(result).to.deep.equal(emptyResult);
+			expect(result).to.equal(emptyResult);
 			done();
 		});
 	});
@@ -107,7 +107,7 @@ describe('exports', function () {
 			.reply(200, '{');
 
 		pubmed.search({searchTerm: 'medicine'}, function (err) {
-			expect(err.message).to.equal('Unexpected end of input');
+			expect(err.message).to.match(/Unexpected end of .* input/);
 			done();
 		});
 	});
@@ -122,7 +122,7 @@ describe('exports', function () {
 			.reply(200, 'fhqwhgads: to the limit');
 
 		pubmed.search({searchTerm: 'medicine'}, function (err) {
-			expect(err.message).to.equal('Unexpected token h');
+			expect(err.message).to.match(/Unexpected token h/);
 			done();
 		});
 	});
@@ -234,7 +234,7 @@ describe('exports', function () {
 		pubmed.search({searchTerm: 'medisine'}, function (err, result) {
 			expect(err).to.be.not.ok;
 			expect(result.data.length).to.equal(0);
-			expect(result.suggestedTerms).to.deep.equal(['medicine']);
+			expect(result.suggestedTerms).to.equal(['medicine']);
 			done();
 		});
 	});
@@ -250,7 +250,7 @@ describe('exports', function () {
 
 		pubmed.search({searchTerm: 'medisine'}, function (err, result) {
 			expect(err).to.be.not.ok;
-			expect(result.suggestedTerms).to.deep.equal([]);
+			expect(result.suggestedTerms).to.equal([]);
 			done();
 		});
 	});
@@ -266,7 +266,7 @@ describe('exports', function () {
 
 		pubmed.search({searchTerm: 'medisine'}, function (err, result) {
 			expect(err).to.be.not.ok;
-			expect(result.suggestedTerms).to.deep.equal([]);
+			expect(result.suggestedTerms).to.equal([]);
 			done();
 		});
 	});
@@ -284,7 +284,7 @@ describe('exports', function () {
 		
 		pubmed.search({searchTerm: 'medicine'}, function (err, result) {
 			expect(err).to.be.not.ok;
-			expect(result.data).to.deep.equal([{name: 'Medicine 1', url: 'http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=pubmed&cmd=Retrieve&dopt=AbstractPlus&query_hl=2&itool=pubmed_docsum&tool=foo&otool=bar&list_uids=25230398'}]);
+			expect(result.data).to.equal([{name: 'Medicine 1', url: 'http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=pubmed&cmd=Retrieve&dopt=AbstractPlus&query_hl=2&itool=pubmed_docsum&tool=foo&otool=bar&list_uids=25230398'}]);
 			done();
 		});
 	});

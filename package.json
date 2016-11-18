@@ -18,9 +18,9 @@
     "node": ">=4.2.6"
   },
   "devDependencies": {
-    "code": "^2.1.0",
+    "code": "^4.0.0",
     "jshint": "^2.5.5",
-    "lab": "^8.2.0",
+    "lab": "^11.2.1",
     "nock": "^0.47.0",
     "precommit-hook": "^1.0.7",
     "rewire": "^2.1.0"
