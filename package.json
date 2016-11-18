@@ -5,7 +5,7 @@
     "type": "git",
     "url": "https://github.com/ucsf-ckm/amalgamatic-pubmed.git"
   },
-  "version": "3.2.3",
+  "version": "3.3.0",
   "dependencies": {
     "async": "^0.9.0",
     "util-extend": "^1.0.1",
