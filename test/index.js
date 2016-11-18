@@ -107,7 +107,7 @@ describe('exports', function () {
 			.reply(200, '{');
 
 		pubmed.search({searchTerm: 'medicine'}, function (err) {
-			expect(err.message).to.match(/Unexpected end of .* input/);
+			expect(err.message).to.match(/Unexpected end of\b.*\binput/);
 			done();
 		});
 	});
